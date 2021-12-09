@@ -1,0 +1,332 @@
+button {
+    padding: 2px 3px;
+    padding-left:4px;
+    font-size: 14px;
+    color: white;
+}
+
+button:hover {
+    background-color: lightgreen;
+}
+
+.appHeader {
+    color:white;
+    font-weight:bolder;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(164, 211, 255);
+    padding: 5px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+#searchBar {
+    display: inline-block;
+    text-align: right;
+    padding: 5px;
+}
+
+#searchBar label {
+    display: inline-block;
+    text-align: right;
+    padding-right: 10px;
+}
+
+#searchBar input {
+    width: 200px;
+    display: inline-block;
+}
+
+.header-news-container > .headerTitles:hover {
+    cursor: pointer;
+    border: 1px solid rgb(255, 120, 120);
+}
+
+.header-news-container > .headerTitles {
+    background-color: rgb(255, 52, 52);
+    user-select: none;
+}
+
+.header-news-container > .headerTitles.sorted {
+    background-color: rgb(235, 24, 24);
+}
+
+.header-news-container {
+    display: grid;
+    grid-template-columns: 25% 25% 35% 5% 10%;
+}
+
+.header-news-container div {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: left;
+    padding: 5px;
+    background-color: green;
+    color: white;
+}
+
+.news-list-scroll-containter {
+    height: 80vh;
+    background-color: white;
+}
+
+.news {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 20% 60% min-content min-content;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.news-list-container div {
+    text-align: left;
+    padding: 5px;
+}
+
+.oddRow {
+    background-color: white;
+    border-top:1px solid white;
+    border-bottom:1px solid white;
+}
+
+.evenRow {
+    background-color: rgb(220, 255, 220);
+    border-top:1px solid rgb(220, 255, 220);;
+    border-bottom:1px solid rgb(220, 255, 220);;
+}
+
+.selectedRow {
+    border-top:1px solid green;
+    border-bottom:1px solid green;
+}
+
+.waiting {
+    font-size: 14px;
+    font-weight: bold;
+    color:green;
+}
+
+.httpError {
+    font-size: 14px;
+    font-weight: bold;
+    color:red;
+}
+
+.form-container {
+    overflow-y: hidden;
+}
+
+.form-news-container {
+    display: grid;
+    grid-template-columns:  90% min-content min-content;
+    border: 1px solid red;
+    background-color: lightgreen;
+    overflow-y: scroll;
+}
+
+.form-news-container .thumbnail {
+    width: 200px;
+}
+
+.form-news-container div {
+    text-align: left;
+    padding: 5px;
+}
+
+.cell {
+    height: 40px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.newAuthorContainer {
+    display: flex;
+    align-items: flex-end;
+    align-content: flex-end;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.news .newsAuthor {
+    text-align: right;
+}
+
+.newsAuthorAvatar { 
+    background:url(/images/No_Avatar.png) no-repeat center;
+    background-size: cover;
+    width: 50px;
+    height: 50px;
+}
+
+.news .newsDate {
+    padding: 5px;
+    text-align: center;
+}
+
+.newsTitle:disabled, .newsText:disabled {
+    margin: 5px;
+    border: 0;
+    background-color: transparent;
+}
+
+.newsTitle:disabled {
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.newsTitle, .newsText {
+    background-color: rgb(212, 231, 255);
+    height: min-content;
+    resize: none;
+}
+
+.news input {
+    display: block;
+}
+
+.editNewsButton {
+    width: 30px;
+    height: 30px;
+    background-color: rgb(12, 112, 42) !important;
+    color: white;
+    padding: 10px;
+}
+
+.validNewsButton {
+    width: 30px;
+    height: 30px;
+    background-color: rgb(187, 255, 0) !important;
+    color: white;
+    padding: 10px;
+}
+
+.deleteNewsButton {
+    width: 30px;
+    height: 30px;
+    background-color: blue;
+    color: white;
+    padding: 10px;
+}
+
+.thumbnail {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    vertical-align:top; 
+    text-align: center;
+}
+
+.user-management-container {
+    display:flex;
+    align-items: center;
+    justify-content: right;
+    gap: 10px;
+}
+
+.waiting {
+    font-size: 14px;
+    font-weight: bold;
+    color:green;
+}
+
+.httpError {
+    font-size: 14px;
+    font-weight: bold;
+    color:red;
+}
+
+.avatar{
+    width:48px;
+    height: 48px;
+    border-radius: 24px;
+    float:left;
+}
+
+.icon {
+    margin-top:-11px;
+    font-size: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.giconBig {
+    font-size: 22px;
+    width: 20px;
+    cursor: pointer;
+}
+
+#dialog-Container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.searchAuthorContainer {
+    display: inline-block;
+}
+
+#searchInputAuthor {
+    margin: 0;
+    cursor: default;
+}
+
+.dropbtn {
+    margin: 0;
+    width: 32px;
+    height: 32px;
+    background-color: #3498DB;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.dropItem {
+    width: 100%;
+}
+  
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #2980B9;
+}
+
+.dropdownContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd
+}
+
+.show {
+    display:block;
+}

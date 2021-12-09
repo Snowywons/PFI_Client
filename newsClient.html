@@ -1,0 +1,1127 @@
+<!--
+    Noms des équipiers: Jimi-Luc Denis, Julie-Anne Castonguay
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1">
+        <title>Fils de nouvelles</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- Style pour les infobulles -->
+        <link rel="stylesheet" href="css/tooltip.css">
+
+        <!-- Style pour l'interface et la liste des nouvelles -->
+        <link rel="stylesheet" href="css/newsLayout.css">
+
+        <!-- pour le dialogue de confirmation de retrait d'une nouvelle -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+        <!---STYLES BUNDLE -------------------------------------------------------------------------->
+        <link rel="stylesheet" href="css/jquery-ui.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+        <!-- Font awesome styles -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+        <!-- lien vers le favicon généré par https://favicon.io/favicon-converter/ -->
+        <link rel="icon" href="news.ico">
+
+    </head>
+    <body>
+        <!-- Entête de la liste de nouvelles -->
+        <div class="container">
+            <div class="array-container">
+                <div class="header-container">
+                    <div>
+                        <a href="/" tooltip="Actualiser" tooltip-position="right">
+                            <img src="news.ico" alt="Image introuvable" style="width:50px; height:50px">
+                        </a>
+
+                        <button id="addNewsCmd"
+                            tooltip="Ajouter une nouvelle" tooltip-position="right">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+
+                        <div id="searchBar">
+                            <div class="searchAuthorContainer">
+                                <input type='hidden' id='searchInputAuthorId' disabled/>
+                                <input type="text" id="searchInputAuthor" placeholder="Recherche par auteur" class="form-control" disabled/>
+                                <div class="dropdownContainer">
+                                    <button onclick="GetAllAuthorNames()" class="dropbtn glyphicon glyphicon-arrow-down"></button>
+                                    <div id="dropdownList" class="dropdown-content">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="text" id="searchInputKeywords" placeholder="Recherche par mots-clés" class="form-control"/>
+        
+                            <button id="searchNewsCmd"
+                                tooltip="Rechercher" tooltip-position="left">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+        
+                            <button id="cancelSearchNewsCmd"
+                                tooltip="Effacer" tooltip-position="left">
+                                <span class="glyphicon glyphicon-repeat"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-management-container">
+                        <div id="avatarContainer"></div>
+                        <h4 id="username">Non connecté</h4>
+                        <div id="btn_OpenLoginForm" tooltip="Connexion" tooltip-position="left">
+                            <span id="showSearchIcon" class="giconBig glyphicon glyphicon-log-in">&nbsp;</span>
+                        </div>
+                        <div id="btn_OpenConfirmLogout" tooltip="Déconnexion" tooltip-position="bottom">
+                            <span id="showSearchIcon" class="giconBig glyphicon glyphicon-log-out">&nbsp;</span>
+                        </div>
+                        <div id="btn_OpenProfilDialog" tooltip="Enregistrement" tooltip-position="left">
+                            <img src="images/register.png" id="showRegister" class="icon">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-list-scroll-containter">
+                    <div class="news-list-container" id="newsList">
+                        <!-- La liste de news sera injectée ici -->
+                    </div>
+                </div>
+
+                <div id="dialog-Container">
+                    <!---LOGIN DIALOG--------------------------------------------------------------------------->
+                    <div id="dialog-loginForm" title="Connexion" class="dialog">
+                        <form id="loginForm" class="form-group">
+                            <input type="text" id="loginEmail" placeholder="Courriel" class="form-control" />
+                            <input type="password" id="loginPassword" placeholder="Mot de passe" class="form-control" />
+                            <br>
+                            <div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" id="remember-me">
+                                <label class="form-check-label" for="remember-me">Se souvenir de moi</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!---PROFIL DIALOG-------------------------------------------------------------------------->
+                    <div id="dialog-profilForm" title="Profil" class="dialog">
+                        <form id="profilForm" class="form-group">
+                            <input type="hidden" id="avatarGUID" />
+                            <input type="hidden" id="profilId" />
+                            <input type="text" id="profilUsername" placeholder="Nom d'usager" class="form-control" />
+                            <input type="text" id="profilEmail" placeholder="Courriel" class="form-control" />
+                            <input type="password" id="profilPassword" placeholder="Mot de passe" class="form-control" />
+                            <br>
+                            <input type="password" id="profilConfirmPassword" placeholder="Confirmation" class="form-control" />
+                            <br>
+                            <div style="vertical-align:top; text-align: center ">
+                                <div class='imageDownloader' id='avatar' defautImageSrc='images/No_Avatar.png' canbeedited='true'></div>
+                                <label>(cliquez pour changer l'avatar)</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!---WAITING DIALOG-------------------------------------------------------------------------->
+                    <div id="dialog-waiting" title="" class="dialog">
+                        <img src="images/writing.gif" alt="waiting" />
+                    </div>
+                </div>
+
+                <!---OLD NEWS VALUES-------------------------------------------------------------------------->
+                <input type="hidden" id="oldNewsTitle"/>
+                <input type="hidden" id="oldNewsText"/>
+            </div>
+        </div>
+
+        <!-- Fichier local qui contient la librairie jQuery -->
+        <script src="js/jquery-3.3.1.js"></script>
+        <!-- Fichier local qui contient la librairie de Validation -->
+        <script src="js/Validation.js"></script>
+        <!-- Fichier local qui contient les fonctions de requête au service Web API -->
+        <script src="js/newsWebAPIRequest.js"></script>
+        <!-- Fichier local qui contient la librairie de dialogue de confirmation -->
+        <script src="js/jquery-confirm.js"></script>
+        <!-- Fichier local qui contient la librairie de gestion de champ masqué -->
+        <script src="js/jquery.maskedinput.js"></script>
+        <script src="js/jquery-ui.js"></script>
+
+        <script src="js/imageUploadUtilities.js"></script>
+
+        <script>
+            "use strict";
+
+            $(document).ready(initUI);
+
+            var pattern = /[^\sa-zA-Zàâäçéèêëìîïòôöùûü0-9]/g;
+            var newsPattern = /[^\sa-zA-ZÀàÂâÄäÇçÉéÈèÊêËëÌìÎîÏïÒòÔôÖöÙùÛûÜü0-9!?@#$%&()\\-`'"’:;.+,\/«»-œ-]/g;
+
+            let CRUD_OnGoing = false;
+            let currentETag = "";
+            let editProfil = false;
+            let connected = false;
+            let profilValidationProvider = null;
+            let periodicRefreshPeriod = 4; // seconds
+            let periodicRefreshBlockOnStart = true;
+            let pauseNewsListPeriodicRefresh = false;
+
+            let currentNewsArray = [];
+
+            let iniMinNewsIndex = 0;
+            let iniMaxNewsIndex = 4;
+            let minNewsIndex = iniMinNewsIndex;
+            let maxNewsIndex = iniMaxNewsIndex;
+            let forceFetchNews = true;
+            let forceEtagRefresh = false;
+
+            function initUI() {
+                initProfilValidation();
+                initLoginDialog();
+                initProfilDialog();
+                initWaitingDialog();
+
+                $("#btn_OpenLoginForm").click(OpenLoginForm);
+                $("#btn_OpenConfirmLogout").click(OpenConfirmLogout);
+                $("#btn_OpenProfilDialog").click(OpenProfilDialog);
+
+                $("#searchInputKeywords").keyup(function(e) {
+                    e.preventDefault();
+                    var $input = $(this);
+                    if (pattern.test(this.value)) {
+                        $input.val($input.val().replace(pattern, function(str) { return ''; }));
+                    }
+                });
+                
+                eraseForm();
+
+                $('#searchNewsCmd').click(()=> { clearNewsList(); getNews() });
+                $('#cancelSearchNewsCmd').click( ()=> { eraseSearchNewsForm(); clearNewsList(); getNews();});
+
+                $('#addNewsCmd').click(addNews);
+                $('#cancelCmd').click(eraseForm);
+
+                updateUI();
+
+                installPeriodicNewsListRefresh();
+                InstallFetchOnScroll();
+                AddCloseDropDownMenuEvent();
+            }
+
+            function installPeriodicNewsListRefresh() {
+                setInterval(() => {
+
+                    if (periodicRefreshBlockOnStart) {
+                        periodicRefreshBlockOnStart = false;
+                        return;
+                    }
+
+                    if (retrieveLoggedUser() !== null && !CRUD_OnGoing && !pauseNewsListPeriodicRefresh) {
+                        refreshETag();
+                    }
+                },
+                    periodicRefreshPeriod * 1000
+                );
+            }
+
+            function updateEtag(etag) {
+                console.log("ETAG", etag);
+
+                if (currentETag !== etag) {
+                    clearNewsList();
+                    getNews();
+                    currentETag = etag;
+                    console.log("Data updated!");
+                } else {
+                    console.log("Data up to date..");
+                }
+            }
+
+            function refreshETag() {
+                webAPI_GET_ETAG(updateEtag, insertErrorStatus);
+            }
+
+            function insertErrorStatus(status){
+                $('#newsList').empty()
+                $('#newsList').append($('<img src="images/error.png" style="width:60px;margin:10px" alt="httpError"/>'));
+                $('#newsList').append(makeCell("Erreur de requête au service Web...", "httpError"));
+                $('#newsList').append(makeCell(status, "httpError"));
+            }
+
+            function operationOnGoing() {
+                return CRUD_OnGoing || editProfil;
+            }
+
+            //-----------------------------------------------------------------------------------------------------------------------------
+
+            function initProfilDialog() {
+            $("#dialog-profilForm").dialog(
+                {
+                    autoOpen: false,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    buttons: [
+                        {
+                            id: 'btn-SaveProfil',
+                            text: 'Enregister',
+                            click: function () {
+                                if (profilValidationProvider.isValid()) {
+                                    let profilFromForm = {
+                                        Id: parseInt($("#profilId").val()),
+                                        Name: $("#profilUsername").val(),
+                                        Email: $("#profilEmail").val(),
+                                        Password: $("#profilPassword").val(),
+                                        AvatarGUID: $("#avatarGUID").val(),
+                                        ImageData: getImageData('avatar')
+                                    }
+                                    $("#dialog-waiting").dialog('open');
+                                    if (connected) {
+                                        webAPI_ChangeProfil(profilFromForm, () => { $("#dialog-profilForm").dialog("close"); closeWaitingDialog(); updateUI(); }, AlertError);
+                                    }
+                                    else {
+                                        profilFromForm.Id = 0;
+                                        webAPI_Register(profilFromForm, () => { $("#dialog-profilForm").dialog("close"); closeWaitingDialog(); updateUI(); }, (error)=> { closeWaitingDialog(); AlertError(error);} );
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            id: 'btn-CancelProfil',
+                            text: 'Annuler',
+                            click: function () {
+                                $(this).dialog('close');
+                            }
+                        },
+                        {
+                            id: 'btn-deleteProfil',
+                            text: 'Désinscription',
+                            click: function () {
+                                confirmDeleteAccount();
+                            }
+                        }
+                    ]
+                });
+            $('#dialog-profilForm').on('dialogopen', function (event) {
+                pauseNewsListPeriodicRefresh = true;
+                resetProfilValidation();
+                $("#profilId").val(0);
+                $('#btn-SaveProfil').addClass("btn btn-primary");
+                $('#btn-deleteProfil').addClass("btn btn-danger");
+                $('#btn-CancelProfil').addClass("btn btn-secondary");
+                if (connected) {
+                    $('#dialog-profilForm').dialog('option', 'title', 'Modification de votre profil...');
+                    $("#profilId").val(retrieveLoggedUser().Id);
+                    $('#profilUsername').val(retrieveLoggedUser().Name);
+                    $('#profilEmail').val(retrieveLoggedUser().Email);
+                    $('#avatarGUID').val(retrieveLoggedUser().AvatarGUID);
+                    if (retrieveLoggedUser().AvatarURL != "")
+                        setImageDownloaderImage('avatar', retrieveLoggedUser().AvatarURL);
+                    else
+                        setImageDownloaderBlankImage('avatar');
+                    $('#btn-deleteProfil').show();
+                } else {
+                    $('#dialog-profilForm').dialog('option', 'title', 'Création de compte...');
+                    $('#profilUsername').val("");
+                    $('#profilEmail').val("");
+                    setImageDownloaderBlankImage('avatar');
+                    $('#btn-deleteProfil').hide();
+                }
+                $('#profilPassword').val("");
+                $('#profilConfirmPassword').val("");
+                $("#btn_OpenAddphotoDialog").hide();
+            });
+            $('#dialog-profilForm').on('dialogclose', function (event) {
+                pauseNewsListPeriodicRefresh = false;
+                editProfil = false;
+                if (connected)
+                    $("#btn_OpenAddphotoDialog").show();
+            });
+            $('#dialog-Container').append($("#dialog-profilForm").parent());
+        }
+
+            function OpenProfilDialog() {
+                if (!operationOnGoing()) {
+                    pauseNewsListPeriodicRefresh = true;
+                    editProfil = true;
+                    $("#dialog-profilForm").dialog('open');
+                }
+            }
+
+            function confirmDeleteAccount() {
+                pauseNewsListPeriodicRefresh = true;
+                $.confirm({
+                    title: 'Retrait de compte',
+                    content: '<b>Voulez-vous vraiment effacer votre compte <br>ainsi que toutes vos photos?</b>',
+                    buttons: {
+                        confirmer:
+                            function () {
+                                if (connected) {
+                                    webAPI_DELETE_Account(retrieveLoggedUser().Id,
+                                        function () {
+                                            closeAllDialog();
+                                            pauseNewsListPeriodicRefresh = true;
+                                            forceLogout();
+                                        },
+                                        AlertError);
+                                }
+                            },
+                        annuler: {},
+                    }
+                });
+            }
+
+            function initLoginDialog() {
+                $("#dialog-loginForm").dialog(
+                    {
+                        autoOpen: false,
+                        show: { effect: 'fade', speed: 400 },
+                        hide: { effect: 'fade', speed: 400 },
+                        buttons: [
+                            {
+                                id: 'btn-OkLogin',
+                                text: 'Ok',
+                                click: function () {
+                                    pauseNewsListPeriodicRefresh = false;
+                                    forceFetchNews = true;
+                                    openWaitingDialog();
+                                    webAPI_login($("#loginEmail").val(),
+                                        $("#loginPassword").val(),
+                                        () => {
+                                            currentETag = "";
+                                            $("#dialog-loginForm").dialog("close");
+                                            updateUI();
+                                        },
+                                        failLogin);
+                                }
+                            },
+                            {
+                                id: 'btn-CancelLogin',
+                                text: 'Annuler',
+                                click: function () {
+                                    $(this).dialog('close');
+                                }
+                            }
+                        ]
+                    });
+                $('#dialog-loginForm').on('dialogopen', function (event) {
+                    pauseNewsListPeriodicRefresh = true;
+                    if (localStorage.getItem('rememberme') == "1") {
+                        $("#remember-me").attr("checked", "checked");
+                        let email = localStorage.getItem('loginemail');
+                        let password = localStorage.getItem('loginpassword');
+                        if (email) $("#loginEmail").val(email);
+                        if (password) $("#loginPassword").val(password);
+                    } else {
+                        $("#loginEmail").val("");
+                        $("#loginPassword").val("");
+                    }
+                });
+                $('#dialog-loginForm').on('dialogclose', function (event) {
+                    pauseNewsListPeriodicRefresh = false;
+                    if ($('#remember-me').is(":checked")) {
+                        localStorage.setItem('rememberme', "1");
+                        localStorage.setItem('loginemail', $("#loginEmail").val());
+                        localStorage.setItem('loginpassword', $("#loginPassword").val());
+                    } else {
+                        localStorage.setItem('rememberme', "0");
+                        localStorage.removeItem('loginemail');
+                        localStorage.removeItem('loginpassword');
+                    }
+                });
+                $('#dialog-Container').append($("#dialog-loginForm").parent());
+            }
+
+            function OpenConfirmLogout() {
+                if (!operationOnGoing()) {
+                    $.confirm({
+                        title: 'Déconnexion...',
+                        content: 'Voulez-vous vous déconnecter?',
+                        buttons: {
+                            confirmer: function () {
+                                pauseNewsListPeriodicRefresh = true;
+                                webAPI_logout(retrieveLoggedUser().Id, updateUI, AlertError);
+                            },
+                            annuler: {},
+                        }
+                    });
+                }
+            }
+            
+            function OpenLoginForm() {
+                if (!operationOnGoing()) {
+                    $('#btn-OkLogin').addClass("btn btn-primary");
+                    $('#btn-CancelLogin').addClass("btn btn-secondary");
+                    $("#dialog-loginForm").dialog('open');
+                }
+            }
+            
+            function initWaitingDialog() {
+                $("#dialog-waiting").dialog({
+                    autoOpen: false,
+                    position: { my: "center", at: "center", of: "#dialog-Container" }, // Set the position to center of the div.
+                    show: { effect: 'fade', duration: 400 },
+                    hide: { effect: 'fade', duration: 400 },
+                    width: "200px"
+                });
+
+                $('#dialog-Container').append($("#dialog-waiting").parent());
+            }
+            
+            function openWaitingDialog() {
+                $("#dialog-waiting").dialog('open');
+            }
+            
+            function closeWaitingDialog() {
+                $("#dialog-waiting").dialog('close');
+            }
+
+            function setUsername(username) {
+                $("#username").html("<span id='link_OpenProfilDialog' style='color:blue;' tooltip='Modifier votre profil' class='clickable'>" + username + "</span>");
+                $("#link_OpenProfilDialog").click(OpenProfilDialog);
+            }
+
+            function unsetUsername() {
+                $("#username").html("<span style='color:gray'>Non connecté</span>");
+            }
+
+            function failLogin() {
+                closeWaitingDialog();
+                Alert("Connexion échouée");
+                connected = false;
+                unsetUsername();
+                updateUI();
+            }
+
+            function updateConnected() {
+                connected = false;
+                let username = "";
+                if (retrieveLoggedUser() != null) {
+                    username = retrieveLoggedUser().Name;
+                    connected = true;
+                }
+                if (connected) {
+                    setUsername(username);
+                    $("#avatarContainer").empty();
+                    $("#avatarContainer").append(html_fittedAvatar(retrieveLoggedUser().AvatarURL, 'avatar'));
+                    $("#btn_OpenLoginForm").hide();
+                    $("#btn_OpenConfirmLogout").show();
+                    $("#btn_OpenAddphotoDialog").show();
+                    $('#btn_OpenProfilDialog').attr("tooltip", "Profil");
+                }
+                else {
+                    $("#avatarContainer").empty();
+                    unsetUsername();
+                    $("#btn_OpenLoginForm").show();
+                    $("#btn_OpenConfirmLogout").hide();
+                    $("#btn_OpenAddphotoDialog").hide();
+                    $('#btn_OpenProfilDialog').attr("tooltip", "Création de compte");
+                }
+
+                return connected;
+            }
+
+            function updateUI() {
+                if (updateConnected()) {
+                    closeWaitingDialog();
+                    refreshETag();
+                } else {
+                    clearNewsList();
+                    html_mustBeConnected();
+                }
+            }
+
+            function statusToString(status) {
+                let text = "Le serveur ne répond pas.";
+                switch (status) {
+                    case 401: text = "<br>Requête non autorisée. <br>Vous devez être connecté."; break;
+                    case 409: text = "<br>Conflit de données. <br>Requête refusée."; break;
+                    case 422: text = "<br>Format des données soumises incorrect. <br>Requête refusée."; break;
+                }
+                return text;
+            }
+
+            function closeAllDialog() {
+                $(".dialog").dialog("close");
+            }
+            
+            function forceLogout() {
+                Alert("Expiration de permission d'accès. Vous n'êtes plus connecté.");
+                closeAllDialog();
+                deConnect();
+                updateUI(true);
+            }
+
+            function Alert(message) {
+                $.confirm({
+                    title: message,
+                    content: '',
+                    buttons: {
+                        fermer: function () { }
+                    }
+                });
+            }
+            
+            function AlertError(status) {
+                $.confirm({
+                    title: "Message provenant du server..." + status,
+                    content: '<img src="images/error.png" style="width:60px;margin:10px" alt="httpError"/>' + statusToString(status),
+                    buttons: {
+                        fermer: function () {
+                            this.close();
+                            if (status == 401) {
+                                forceLogout();
+                            }
+                            pauseNewsListPeriodicRefresh = true;
+                        }
+                    }
+                });
+            }
+
+            function initProfilValidation() {
+                profilValidationProvider = new ValidationProvider("profilForm");
+                profilValidationProvider.addControl("profilUsername", validate_ProfilUsername, false /*validateOnLeave*/);
+                profilValidationProvider.addControl("profilEmail", validate_ProfilEmail, false /*validateOnLeave*/);
+                profilValidationProvider.addControl("profilPassword", validate_ProfilPassword, false /*validateOnLeave*/);
+                profilValidationProvider.addControl("profilConfirmPassword", validate_ProfilConfirmPassword, false /*validateOnLeave*/);
+            }
+
+            function resetProfilValidation() {
+                profilValidationProvider.reset();
+            }
+
+            function validate_ProfilUsername() {
+                let TBX_Username = document.getElementById("profilUsername");
+                if (TBX_Username.value === "")
+                    return "Nom d'usager manquant";
+                return "";
+            }
+
+            function validate_ProfilEmail() {
+                let TBX_Email = document.getElementById("profilEmail");
+                let EmailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (TBX_Email.value === "")
+                    return "Courriel manquant";
+                if (!EmailRegex.test(TBX_Email.value))
+                    return "Courriel invalide";
+                return "";
+            }
+
+            function validate_ProfilPassword() {
+                return "";
+            }
+            
+            function validate_ProfilConfirmPassword() {
+                let TBX_Password = document.getElementById("profilPassword");;
+                let TBX_Confirm = document.getElementById("profilConfirmPassword");
+                if (TBX_Password.value != "") {
+                    if (TBX_Confirm.value != TBX_Password.value)
+                        return "Différent du mot de passe.";
+                }
+                return "";
+            }
+
+            //-----------------------------------------------------------------------------------------------------------------------------
+
+            function resetValidation() {
+                profilValidationProvider.reset();
+            }
+
+            function validate_NewsTitle(){
+                let TBX_Name = document.getElementById("NewsTitle");
+
+                if (TBX_Name.value === "")
+                    return "Titre manquant";
+
+                return "";
+            }
+
+            function validate_NewsText(){
+                let TBX_Name = document.getElementById("NewsText");
+
+                if (TBX_Name.value === "")
+                    return "Texte manquant";
+
+                return "";
+            }
+
+            function eraseForm() {
+                CRUD_OnGoing = false;
+                resetValidation();
+            }
+
+            function eraseSearchNewsForm() {
+                // Effacer les champs de recherche
+                $('#searchInputAuthor').val('');
+                $('#searchInputAuthorId').val('');
+                $('#searchInputKeywords').val('');
+            }
+
+            function getNews() {
+                if (retrieveLoggedUser() == null) return;
+
+                let params = getParams();
+                if (params)
+                    webAPI_getNewsParams(params, updateNewsList, insertErrorStatus);
+                else
+                    webAPI_getNews(updateNewsList, insertErrorStatus);
+            }
+
+            function makeNewsFromForm(id = -1) {
+                let userId = parseInt(retrieveLoggedUser().Id);
+
+                if (id != -1) {
+                    let title = $('#newsTitle_' + id).val();
+                    let text = $('#newsText_' + id).val();
+                    return {
+                                Id: parseInt(id), 
+                                UserId: userId, 
+                                Title: title.length > 0 ? title : " ",
+                                ImageGUID: $('#editNewsImageGUID_' + id).val(),
+                                ImageData: getImageData('editNewsImage' + id),
+                                Text: text.length > 0 ? text : " ",
+                                Created: 0,
+                            };
+                }
+                return {
+                            Id: 0, 
+                            UserId: userId, 
+                            Title: " ", 
+                            ImageGUID: "", 
+                            ImageData: "",
+                            Text: " ",
+                            Created: 0
+                        };
+            }
+
+            function getParams(params = "") {
+                let authorId = $("#searchInputAuthorId").val();
+                if (authorId)
+                    params += "&author=" + authorId;
+
+                let searchInputKeywords = $("#searchInputKeywords").val().trim();
+                if (searchInputKeywords)
+                    params += "&keywords=" + searchInputKeywords;
+
+                params += "&min=" + minNewsIndex + "&max=" + maxNewsIndex;
+
+                return params;
+            }
+
+            function addNews() {
+                if (retrieveLoggedUser() == null) {
+                    Alert("Vous devez être connecté pour publier des nouvelles.");
+                    return;
+                };
+                
+                let news = makeNewsFromForm();
+                eraseForm();
+                openWaitingDialog();
+                webAPI_addNews(news, updateUI, AlertError);
+            }
+
+            function editNews(e){
+                let array = e.target.id.split('_');
+                let element, id;
+
+                //------Obtention des bons ID------------------------------------------
+                if (array.length > 2)
+                {
+                    element = array[1];
+                    id = array[2];
+
+                } else {
+                    array = e.target.id.split('editNewsImage');
+                    if (array.length < 2) return; // Ce n'est pas une édition d'image.
+                    CRUD_OnGoing = true;
+                    element = "image";
+                    id = array[1].split("_")[0];
+                }
+
+                let titleIsValid = true;
+                let textIsValid = true;
+
+                //-----------------------------------------------------------------------
+                if (!CRUD_OnGoing)
+                {
+                    $("#oldNewsTitle").val($("#newsTitle_"+ id).val());
+                    $("#oldNewsText").val($("#newsText_"+ id).val());
+                    CRUD_OnGoing = true;
+
+                    if (element == "title") {
+                        $("#editNews_title_"+ id).removeClass("glyphicon-pencil");
+                        $("#editNews_title_"+ id).removeClass("editNewsCmd");
+                        $("#editNews_title_"+ id).addClass("glyphicon-ok");
+                        $("#editNews_title_"+ id).addClass("validNewsCmd");
+                        $("#cancelNews_title_"+ id).show();
+                        $("#editNews_text_"+ id).hide();
+                        $("#newsTitle_"+ id).prop("disabled", false);
+                    }
+
+                    if (element == "text") {
+                        $("#editNews_text_"+ id).removeClass("glyphicon-pencil");
+                        $("#editNews_text_"+ id).removeClass("editNewsCmd");
+                        $("#editNews_text_"+ id).addClass("glyphicon-ok");
+                        $("#editNews_text_"+ id).addClass("validNewsCmd");
+                        $("#cancelNews_text_"+ id).show();
+                        $("#editNews_title_"+ id).hide();
+                        $("#newsText_"+ id).prop("disabled", false);
+                    }
+
+                    webAPI_getSingleNews(id, (error) => console.log(error));
+                }
+                else
+                {
+                    if (element == "title") {
+                        titleIsValid = !newsPattern.test($("#newsTitle_"+ id).val());
+                    }
+                    if (element == "text") {
+                        textIsValid = !newsPattern.test($("#newsText_"+ id).val());
+                    }
+
+                    if (titleIsValid && textIsValid) {
+                        $("#newsTitle_"+ id).prop("disabled", true);
+                        $("#newsText_"+ id).prop("disabled", true);
+
+                        cancelNews(e, false);
+                        openWaitingDialog();
+                        webAPI_modifyNews(makeNewsFromForm(id), updateUI, AlertError);
+                    } else {
+                        $("#newsTitle_"+ id).val($("#oldNewsTitle").val());
+                        $("#newsText_"+ id).val($("#oldNewsText").val());
+                        Alert("Données invalides. Vous avez entré des caractères non-autorisé.");
+                    }
+
+                }
+            }
+
+            function cancelNews(e, resetData = true) {
+                let array = e.target.id.split('_');
+                let element, id;
+                element = array[1];
+                id = array[2];
+
+                CRUD_OnGoing = false;
+
+                $("#editNews_title_"+ id).removeClass("glyphicon-ok");
+                $("#editNews_title_"+ id).removeClass("validNewsCmd");
+                $("#editNews_title_"+ id).addClass("glyphicon-pencil");
+                $("#editNews_title_"+ id).addClass("editNewsCmd");
+                $("#cancelNews_title_"+ id).hide();
+                $("#newsTitle_"+ id).prop("disabled", true);
+
+                $("#editNews_text_"+ id).removeClass("glyphicon-ok");
+                $("#editNews_text_"+ id).removeClass("validNewsCmd");
+                $("#editNews_text_"+ id).addClass("glyphicon-pencil");
+                $("#editNews_text_"+ id).addClass("editNewsCmd");
+                $("#cancelNews_text_"+ id).hide();
+                $("#newsText_"+ id).prop("disabled", true);
+
+                if (resetData) {
+                    $("#newsTitle_"+ id).val($("#oldNewsTitle").val());
+                    $("#newsText_"+ id).val($("#oldNewsText").val());
+                }
+            }
+
+            function deleteNews(e) {
+                let id = parseInt(e.currentTarget.id.split('_')[1]);
+                webAPI_getSingleNews(id, confirmDeleteNews, insertErrorStatus);
+            }
+
+            function confirmDeleteNews(news) {
+                $.confirm({
+                    title: 'Attention!',
+                    content: 'Effacer '+ news.Title +'?',
+                    buttons: {
+                        confirmer: function () {
+                            openWaitingDialog();
+                            webAPI_deleteNews(news.Id, updateUI, insertErrorStatus);
+                        },
+                        annuler: {},
+                    }
+                });
+            }
+
+            function cellOver(e){
+                if (!CRUD_OnGoing) {
+                    let id = e.currentTarget.className.split(' ')[0].split('_')[1];
+
+                    if (GetAuthorPermission(id)) {
+                        $('#editNews_title_' + id).show();
+                        $('#editNews_image_' + id).show();
+                        $('#editNews_text_' + id).show();
+                        $('#deleteNews_' + id).show();
+                    }
+                }
+            }
+            
+            function cellBlur(e){
+                if (!CRUD_OnGoing) {
+                    let id = e.currentTarget.className.split(' ')[0].split('_')[1];
+                    $('#editNews_title_' + id).hide();
+                    $('#editNews_image_' + id).hide();
+                    $('#editNews_text_' + id).hide();
+                    $('#deleteNews_' + id).hide();
+                }
+            }
+
+            function makeTextCell(content, cssClass){
+                return $('<div class= "' + cssClass + '">' + content + '</div>');
+            }
+
+            function makeFaviconCell(content, cssClass){
+                return $("<div class='" + cssClass + "''><img class='favicon' src='https://www.google.com/s2/favicons?sz=32&domain=" + content + "'> " + content + "</div>");
+            }
+
+            function makeCell(cssClass){
+                return $('<div class= "' + cssClass + '"></div>');
+            }
+
+            function makeButton(cssClass, id, tooltip) {
+                return $('<button id="' + id + '" class="'+ cssClass + '"tooltip="' + tooltip + '" tooltip-position="left"></button>');
+            }
+
+            function makeGlyphIcon(glyphIconId){
+                return $("<span class='glyphicon glyphicon-" + glyphIconId + "'></span>");
+            }
+
+            function html_fittedAvatar(Avatar_url, css = '') {
+                return "<div class='" + css + "' style='background:url(" + Avatar_url + ") no-repeat center; background-size: cover; margin-right:5px;'></div>";
+            }
+
+            function thumbNail(news, id) {
+                return $('<div style="vertical-align:top; text-align: center;">'
+                    + '<div class="imageDownloader" id="' + id +'" defautImageSrc="' + news.ImageURL +'" canBeEdited="' + GetAuthorPermission(news.Id)  +'"></div></div>');
+            }
+
+            function GetAuthorPermission(id) {
+                let news = currentNewsArray.find(n => n.Id == id);
+                let userInfos = retrieveLoggedUser();
+                if (!news || !userInfos) return false;
+                return news.UserId == userInfos.Id;
+            }
+
+            function GetAllAuthorNames() {
+                if (retrieveLoggedUser() == null) return;
+
+                let myUserId = retrieveLoggedUser().Id;
+                $("#dropdownList").empty();
+                $("#dropdownList").toggleClass("show");
+                
+                webAPI_getAllUsers((users) => {
+                    $('<button onclick="SetSearchAuthorName(\'\', \'Tous\')" class="dropItem">Tous</button>').appendTo($("#dropdownList"));
+                    $('<button onclick="SetSearchAuthorName('+ retrieveLoggedUser().Id +', \'Mes nouvelles\')" class="dropItem">Mes nouvelles</button>').appendTo($("#dropdownList"));
+
+                    users.sort((a,b) => a.Name.toLowerCase() > b.Name.toLowerCase() ? 1 : -1);
+
+                    users.forEach((user) => {
+                        if (user.Id !== myUserId) {
+                            let div = $('<button onclick="SetSearchAuthorName('+ user.Id +', \'' + user.Name + '\')" class="dropItem">' + user.Name +'</button>');
+                            $(div).appendTo($("#dropdownList"));
+                        }
+                    });
+                });
+            }
+
+            function SetSearchAuthorName(id, name) {
+                $("#searchInputAuthor").val(name);
+                $("#searchInputAuthorId").val(id);
+                CloseDropDownMenu();
+            }
+
+            function AddCloseDropDownMenuEvent() {
+                $(window).click((e) => {
+                    if (!e.target.matches('.dropbtn')) {
+                        CloseDropDownMenu();
+                    }
+                });
+            }
+
+            function CloseDropDownMenu() {
+                var dropdowns = $(".dropdown-content");
+
+                for (let i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+
+                    if ($(openDropdown).hasClass('show')) {
+                        $(openDropdown).removeClass('show');
+                    }
+                }
+            }
+
+            function FetchMoreNews() {
+                    minNewsIndex = maxNewsIndex;
+                    maxNewsIndex += 3;
+                    forceFetchNews = true;
+                    openWaitingDialog();
+                    getNews();
+            }
+
+            function InstallFetchOnScroll() {
+
+                $(window).scroll(function(){
+                    var position = $(window).scrollTop();
+                    var bottom = $(document).height() - $(window).height();
+
+                    if (position == bottom && !forceFetchNews) {
+                        FetchMoreNews();
+                    }
+                });
+            }
+
+            function clearNewsList() {
+                minNewsIndex = iniMinNewsIndex;
+                maxNewsIndex = iniMaxNewsIndex;
+                currentNewsArray = [];
+                $('#newsList').empty();
+            }
+
+            function updateNewsList(newsArray) {
+                // Si le client n'est pas connecté, on ne va pas plus loin
+                if (retrieveLoggedUser() == null)
+                {
+                    clearNewsList();
+                    html_mustBeConnected();
+                    return;
+                }
+
+                // On ajoute en mémoire les nouvelles qu'on vient de récupéer
+                currentNewsArray = currentNewsArray.concat(newsArray);
+
+                // Création des nouvelles
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                let myUserId = retrieveLoggedUser().Id;
+                newsArray.forEach(news => {
+                    createNewsForm(news, myUserId, dateOptions);
+                    textAreaAdjust($("#newsText_" + news.Id));
+               });
+
+               assignNewsButtonEvents();
+               assignImageDownloaderEvents();
+               forceFetchNews = false;
+
+               // Forcer le fetch lorsqu'il n'y a pas de news affichées
+               if ($("#newsList").height() < $(window).height() && newsArray.length > 0)
+               {
+                   FetchMoreNews();
+               } else {
+                   closeWaitingDialog();
+               }
+            }
+
+            function createNewsForm(news, myUserId, dateOptions) {
+
+                // Récupération de l'information de la nouvelle
+                let id = news.Id;
+                let userId = news.UserId;
+                let author = news.AuthorName.trim();
+                let title = news.Title.trim();
+                let imageGUID = news.ImageGUID.trim();
+                let text = news.Text.trim();
+
+                // Si ce n'est pas notre nouvelle et qu'elle est incomplète, on ne l'affiche pas
+                if (userId !== myUserId && (title.length == 0 || imageGUID.length == 0 || text.length == 0)) {
+                    return;
+                }
+
+                let newsDate = new Date(news.Created * 1000).toLocaleDateString('fr-FR', dateOptions);
+
+                // Conteneur versatile
+                let container;
+
+                //------------Création de la nouvelle-------------------------------------------------------------------------------
+                let div = $('<div class="news_' + id + '"/>');
+                $(div).addClass("news");
+                $(div).appendTo($('#newsList'));
+
+                $('<input type="hidden" id="editNewsImageGUID_' + id +'" value="' + imageGUID +'"/>').appendTo(div);
+
+                // AUTHOR
+                $('<div class="newAuthorContainer"></div>')
+                .append(html_fittedAvatar(news["AuthorAvatarURL"], 'avatar'))
+                .append('<div class="newsAuthor">' + author + '</div>')
+                .appendTo(div);
+
+                // TITLE
+                $(div).append('<textarea class="newsTitle" id="newsTitle_' + id +'" placeholder="Titre de la nouvelle" disabled>'+ title +'</textarea>');
+
+                container = $('<div style="margin:0; padding:0;"></div>').appendTo(div);
+                $('<div><button class="editNewsCmd glyphicon glyphicon-pencil" id="editNews_title_' + id + '"/></div>').appendTo(container); ////EDIT
+                $('<div><button class="cancelNewsCmd glyphicon glyphicon-repeat" id="cancelNews_title_' + id + '"/></div>').appendTo(container); ////EDIT
+                
+                $('<div><button class="deleteNewsCmd glyphicon glyphicon-remove" id="deleteNews_' + id + '"/></div>').appendTo(div);
+
+                // DATE
+                $(div).append('<div class="newsDate">' + newsDate + '</div>');
+
+                // IMAGE
+                $(div).append(thumbNail(news, "editNewsImage" + id));
+
+                $(div).append('<div></div>');
+                $(div).append('<div></div>');
+                $(div).append('<div></div>');
+
+                // TEXT
+                $(div).append('<textarea class="newsText" id="newsText_' + id +'" placeholder="Contenu de la nouvelle" disabled>' + text + '</textarea>');
+
+                container = $('<div style="margin:0; padding:0;"></div>').appendTo(div);
+                $('<div><button class="editNewsCmd glyphicon glyphicon-pencil" id="editNews_text_' + id + '"/></div>').appendTo(container); ////EDIT
+                $('<div><button class="cancelNewsCmd glyphicon glyphicon-repeat" id="cancelNews_text_' + id + '"/></div>').appendTo(container); ////EDIT
+
+                $(div).append('<div></div>');
+                //-----------------------------------------------------------------------------------------------------------------
+            }
+
+            function assignNewsButtonEvents() {
+
+                // Bouton EDIT
+               $('.editNewsCmd').each(function() {
+                    if (this.getAttribute('listener') !== 'true') {
+                        this.addEventListener("click", function(e) {
+                            editNews(e);
+                        });
+                        this.setAttribute('listener', 'true');
+                    }
+               });
+               $('.editNewsCmd').hide();
+
+                // Bouton CANCEL
+                $('.cancelNewsCmd').each(function() {
+                    if (this.getAttribute('listener') !== 'true') {
+                        this.addEventListener("click", function(e) {
+                            cancelNews(e);
+                        });
+                        this.setAttribute('listener', 'true');
+                    }
+               });
+               $('.cancelNewsCmd').hide();
+
+               // Bouton DELETE
+               $('.deleteNewsCmd').each(function() {
+                    if (this.getAttribute('listener') !== 'true') {
+                        this.addEventListener("click", function(e) {
+                            deleteNews(e);
+                        });
+                        this.setAttribute('listener', 'true');
+                    }
+               });
+               $('.deleteNewsCmd').hide();
+
+               // Au survole de la souris
+               $('.news').mouseover(cellOver);
+               $('.news').mouseleave(cellBlur);
+            }
+
+            function html_mustBeConnected() {
+                $('<div>Vous devez être connecté pour voir le fils de nouvelles.</div>').appendTo($('#newsList'));
+            }
+        
+            function textAreaAdjust(element) {
+                $(element).height(1);
+                $(element).height(25 + $(element).prop("scrollHeight"));
+            }
+        </script>
+    </body>
+</html>
