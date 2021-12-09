@@ -2,8 +2,8 @@
     Méthodes d'accès aux services Web API News
  */
 
-const apiBaseURL= "http://localhost:5000";
-//onst apiBaseURL= "https://ripe-phrygian-stoat.glitch.me/api/bookmarks";
+//const apiBaseURL= "http://localhost:5000";
+const apiBaseURL= "https://glorious-green-ball.glitch.me";
 
 function webAPI_getNews( successCallBack, errorCallBack) {
     $.ajax({
